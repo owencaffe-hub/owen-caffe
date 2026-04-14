@@ -328,20 +328,20 @@
             if (!storeConfig || !storeConfig.mode || storeConfig.mode === 'auto') {
                 return {
                     isOpen: getAutoOpenStatus(),
-                    label: getAutoOpenStatus() ? '🟢 TOKO BUKA (AUTO)' : '🔴 TOKO TUTUP (AUTO)'
+                    label: getAutoOpenStatus() ? '🟢 TOKO BUKA ' : '🔴 TOKO TUTUP'
                 };
             }
 
             if (storeConfig.mode === 'manual_open') {
                 return {
                     isOpen: true,
-                    label: '🟢 TOKO BUKA (MANUAL)'
+                    label: '🟢 TOKO BUKA '
                 };
             }
 
             return {
                 isOpen: false,
-                label: '🔴 TOKO TUTUP (MANUAL)'
+                label: '🔴 TOKO TUTUP '
             };
         }
 
