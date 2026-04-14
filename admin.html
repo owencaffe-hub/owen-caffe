@@ -26,9 +26,70 @@
             color: #00ffff; 
             text-shadow: 0 0 15px #00ffff; 
             text-transform: uppercase; 
-            margin-bottom: 40px; 
+            margin-bottom: 20px; 
             letter-spacing: 2px;
         }
+
+        .status-box {
+            max-width: 900px;
+            margin: 0 auto 30px auto;
+            background: rgba(0,0,0,0.75);
+            border: 2px solid #00ffff;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .status-title {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ffea00;
+            margin-bottom: 15px;
+        }
+
+        .status-info {
+            text-align: center;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.06);
+        }
+
+        .jadwal-info {
+            text-align: center;
+            color: #00ffff;
+            margin-bottom: 18px;
+            font-size: 0.95rem;
+        }
+
+        .status-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-status {
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: 0.2s;
+            min-width: 120px;
+        }
+
+        .btn-status:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-buka { background: #00c853; color: white; }
+        .btn-tutup { background: #ff4d4d; color: white; }
+        .btn-auto { background: #00ffff; color: black; }
 
         .tanggal-group {
             border: 1px solid rgba(0, 255, 255, 0.3);
@@ -64,7 +125,11 @@
             text-transform: uppercase;
             transition: 0.3s;
         }
-        .btn-hapus-tgl:hover { background: #cc0000; transform: scale(1.05); }
+
+        .btn-hapus-tgl:hover {
+            background: #cc0000;
+            transform: scale(1.05);
+        }
 
         .rekap-grid {
             display: grid;
@@ -82,7 +147,11 @@
             flex-direction: column;
             transition: 0.3s;
         }
-        .rekap-card:hover { border-color: #ffea00; transform: translateY(-5px); }
+
+        .rekap-card:hover {
+            border-color: #ffea00;
+            transform: translateY(-5px);
+        }
 
         .rekap-header {
             background: #00ffff;
@@ -94,7 +163,10 @@
             font-size: 1.1rem;
         }
 
-        .rekap-body { padding: 15px; flex-grow: 1; }
+        .rekap-body {
+            padding: 15px;
+            flex-grow: 1;
+        }
 
         .produk-row {
             display: flex;
@@ -136,13 +208,32 @@
             text-transform: uppercase;
         }
 
-        @media (max-width: 1100px) { .rekap-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 750px) { .rekap-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 1100px) {
+            .rekap-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 750px) {
+            .rekap-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
     <h1>📊 REKAP PESANAN PANHA COFFEE</h1>
+
+    <div class="status-box">
+        <div class="status-title">KONTROL STATUS TOKO</div>
+        <div id="statusInfo" class="status-info">Memuat status toko...</div>
+        <div class="jadwal-info">
+            Jadwal otomatis: <b>BUKA 00:30</b> — <b>TUTUP 00:00</b>
+        </div>
+        <div class="status-actions">
+            <button class="btn-status btn-buka" onclick="setStoreMode('manual_open')">Buka</button>
+            <button class="btn-status btn-tutup" onclick="setStoreMode('manual_closed')">Tutup</button>
+            <button class="btn-status btn-auto" onclick="setStoreMode('auto')">Auto</button>
+        </div>
+    </div>
+
     <div id="masterAdmin"></div>
 
     <script>
@@ -158,17 +249,80 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        function formatTanggalIndo(tglString) {
-            const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-            const part = tglString.split('-'); 
-            if (part.length !== 3) return tglString;
-            return `${parseInt(part[0])} ${bulanIndo[parseInt(part[1]) - 1]} ${part[2]}`;
-        }
-
         function getTodayDate() {
             const d = new Date();
             return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
         }
+
+        function formatTanggalIndo(tglString) {
+            const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const part = tglString.split('-');
+            if (part.length !== 3) return tglString;
+            return `${parseInt(part[0])} ${bulanIndo[parseInt(part[1]) - 1]} ${part[2]}`;
+        }
+
+        function getAutoOpenStatus() {
+            const sekarang = new Date();
+            const jam = sekarang.getHours();
+            const menit = sekarang.getMinutes();
+            const waktuSkg = (jam * 100) + menit;
+
+            return (waktuSkg >= 30);
+        }
+
+        function resolveStoreStatus(storeConfig) {
+            if (!storeConfig || !storeConfig.mode || storeConfig.mode === 'auto') {
+                return {
+                    mode: 'auto',
+                    isOpen: getAutoOpenStatus(),
+                    label: getAutoOpenStatus() ? '🟢 TOKO BUKA (AUTO)' : '🔴 TOKO TUTUP (AUTO)'
+                };
+            }
+
+            if (storeConfig.mode === 'manual_open') {
+                return {
+                    mode: 'manual_open',
+                    isOpen: true,
+                    label: '🟢 TOKO BUKA (MANUAL)'
+                };
+            }
+
+            return {
+                mode: 'manual_closed',
+                isOpen: false,
+                label: '🔴 TOKO TUTUP (MANUAL)'
+            };
+        }
+
+        function setStoreMode(mode) {
+            database.ref('store_status').set({
+                mode: mode,
+                updatedAt: Date.now()
+            });
+        }
+
+        database.ref('store_status').on('value', (snapshot) => {
+            const config = snapshot.val() || { mode: 'auto' };
+            const status = resolveStoreStatus(config);
+            const statusInfo = document.getElementById('statusInfo');
+
+            statusInfo.innerText = status.label;
+            statusInfo.style.color = status.isOpen ? '#00ffff' : '#ff4d4d';
+            statusInfo.style.border = status.isOpen ? '1px solid #00ffff' : '1px solid #ff4d4d';
+        });
+
+        setInterval(() => {
+            database.ref('store_status').once('value').then((snapshot) => {
+                const config = snapshot.val() || { mode: 'auto' };
+                if (config.mode === 'auto') {
+                    const status = resolveStoreStatus(config);
+                    const statusInfo = document.getElementById('statusInfo');
+                    statusInfo.innerText = status.label;
+                    statusInfo.style.color = status.isOpen ? '#00ffff' : '#ff4d4d';
+                    statusInfo.style.border = status.isOpen ? '1px solid #00ffff' : '1px solid #ff4d4d';
+                }
+            });
+        }, 30000);
 
         database.ref('pesanan/').on('value', (snapshot) => {
             const data = snapshot.val();
@@ -192,7 +346,6 @@
                 groups[tglKey][situs].items[p.produk] = (groups[tglKey][situs].items[p.produk] || 0) + qty;
                 groups[tglKey][situs].totalQty += qty;
                 
-                // HANYA NAMA PEMESAN SAJA
                 if (!groups[tglKey][situs].pembeli.includes(p.nama)) {
                     groups[tglKey][situs].pembeli.push(p.nama);
                 }
@@ -218,6 +371,7 @@
                 Object.keys(groups[tgl]).sort().forEach(situs => {
                     const info = groups[tgl][situs];
                     let produkHtml = "";
+
                     for (const [nama, qty] of Object.entries(info.items)) {
                         produkHtml += `<div class="produk-row"><span>🥤 ${nama}</span><span>${qty} Botol</span></div>`;
                     }
