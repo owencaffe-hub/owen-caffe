@@ -1,425 +1,478 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin PANHA COFFEE by OWEN LOUIS</title>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    
-    <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            font-family: 'Segoe UI', sans-serif;
-            color: white;
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-                        url('https://i.pinimg.com/originals/3f/44/e1/3f44e122cfc5609777dba1331525c078.gif');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin PANHA COFFEE by OWEN LOUIS</title>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
-        h1 { 
-            text-align: center; 
-            color: #00ffff; 
-            text-shadow: 0 0 15px #00ffff; 
-            text-transform: uppercase; 
-            margin-bottom: 20px; 
-            letter-spacing: 2px;
-        }
+<style>
+body {
+margin: 0;
+padding: 20px;
+min-height: 100vh;
+font-family: 'Segoe UI', sans-serif;
+color: white;
+background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+url('https://i.pinimg.com/originals/3f/44/e1/3f44e122cfc5609777dba1331525c078.gif');
+background-size: cover;
+background-attachment: fixed;
+background-position: center;
+}
 
-        .status-box {
-            max-width: 900px;
-            margin: 0 auto 30px auto;
-            background: rgba(0,0,0,0.75);
-            border: 2px solid #00ffff;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+h1, h2 {
+text-align: center;
+color: #00ffff;
+text-shadow: 0 0 15px #00ffff;
+text-transform: uppercase;
+}
 
-        .status-title {
-            text-align: center;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #ffea00;
-            margin-bottom: 15px;
-        }
+/* Panel Kontrol Status Toko */
+.status-toko-box {
+background: rgba(0, 0, 0, 0.85);
+border: 2px solid #00ffff;
+border-radius: 20px;
+padding: 25px;
+margin-bottom: 40px;
+box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+text-align: center;
+}
 
-        .status-info {
-            text-align: center;
-            font-size: 1rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            padding: 12px;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.06);
-        }
+.status-display-badge {
+background: rgba(0, 0, 0, 0.8);
+border: 2px solid #00ffff;
+color: #00ffff;
+padding: 12px;
+border-radius: 30px;
+font-weight: bold;
+font-size: 1.1rem;
+margin: 15px auto;
+max-width: 400px;
+}
 
-        .jadwal-info {
-            text-align: center;
-            color: #00ffff;
-            margin-bottom: 18px;
-            font-size: 0.95rem;
-        }
+.status-buttons {
+display: flex;
+gap: 15px;
+justify-content: center;
+margin-top: 20px;
+}
 
-        .status-actions {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
+.btn-status {
+padding: 12px 30px;
+border: none;
+border-radius: 10px;
+font-weight: bold;
+cursor: pointer;
+text-transform: uppercase;
+font-size: 1rem;
+transition: 0.3s;
+}
 
-        .btn-status {
-            border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            text-transform: uppercase;
-            transition: 0.2s;
-            min-width: 120px;
-        }
+.btn-buka-manual { background: #00cc44; color: white; }
+.btn-tutup-manual { background: #ff4d4d; color: white; }
+.btn-auto { background: #00ffff; color: black; }
 
-        .btn-status:hover {
-            transform: translateY(-2px);
-        }
+.btn-status:hover { transform: scale(1.05); filter: brightness(1.2); }
 
-        .btn-buka { background: #00c853; color: white; }
-        .btn-tutup { background: #ff4d4d; color: white; }
-        .btn-auto { background: #00ffff; color: black; }
+/* Kotak Pengelolaan Stok */
+.stok-manager-box {
+background: rgba(0, 0, 0, 0.85);
+border: 2px solid #00ffff;
+border-radius: 20px;
+padding: 25px;
+margin-bottom: 40px;
+box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
 
-        .tanggal-group {
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 50px;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+.stok-list {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+gap: 15px;
+margin-top: 20px;
+}
 
-        .tanggal-label {
-            background: #ffea00;
-            color: black;
-            padding: 12px 30px;
-            display: inline-block;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 1.3rem;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 15px rgba(255, 234, 0, 0.3);
-        }
+.stok-item {
+background: rgba(20, 20, 20, 0.9);
+border: 1px solid #00ffff;
+border-radius: 12px;
+padding: 15px;
+text-align: center;
+}
 
-        .btn-hapus-tgl {
-            background: #ff4d4d;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            float: right;
-            font-weight: bold;
-            text-transform: uppercase;
-            transition: 0.3s;
-        }
+.stok-item img {
+width: 100%;
+height: 120px;
+object-fit: cover;
+border-radius: 8px;
+margin-bottom: 10px;
+}
 
-        .btn-hapus-tgl:hover {
-            background: #cc0000;
-            transform: scale(1.05);
-        }
+.stok-controls {
+display: flex;
+gap: 5px;
+margin-top: 10px;
+justify-content: center;
+}
 
-        .rekap-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 25px;
-            clear: both;
-        }
+.stok-input {
+width: 60px;
+padding: 8px;
+text-align: center;
+background: black;
+color: white;
+border: 1px solid #00ffff;
+border-radius: 5px;
+font-weight: bold;
+}
 
-        .rekap-card {
-            background: rgba(20, 20, 20, 0.9);
-            border: 2px solid #00ffff;
-            border-radius: 15px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            transition: 0.3s;
-        }
+.btn-update-stok {
+background: #ffea00;
+color: black;
+border: none;
+padding: 8px 12px;
+border-radius: 5px;
+font-weight: bold;
+cursor: pointer;
+}
 
-        .rekap-card:hover {
-            border-color: #ffea00;
-            transform: translateY(-5px);
-        }
+.tanggal-group {
+border: 1px solid rgba(0, 255, 255, 0.3);
+border-radius: 20px;
+padding: 25px;
+margin-bottom: 50px;
+background: rgba(0, 0, 0, 0.7);
+backdrop-filter: blur(10px);
+}
 
-        .rekap-header {
-            background: #00ffff;
-            color: black;
-            padding: 12px;
-            font-weight: bold;
-            text-align: center;
-            text-transform: uppercase;
-            font-size: 1.1rem;
-        }
+.tanggal-label {
+background: #ffea00;
+color: black;
+padding: 12px 30px;
+display: inline-block;
+border-radius: 10px;
+font-weight: bold;
+font-size: 1.3rem;
+margin-bottom: 25px;
+}
 
-        .rekap-body {
-            padding: 15px;
-            flex-grow: 1;
-        }
+.btn-hapus-tgl {
+background: #ff4d4d;
+color: white;
+border: none;
+padding: 12px 20px;
+border-radius: 8px;
+cursor: pointer;
+float: right;
+font-weight: bold;
+text-transform: uppercase;
+}
 
-        .produk-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
-            font-weight: bold;
-            color: #00ffff;
-        }
+.rekap-grid {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 25px;
+clear: both;
+}
 
-        .pembeli-box {
-            margin-top: 15px;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            font-size: 0.9rem;
-            color: #ffea00;
-            border-left: 4px solid #ffea00;
-        }
+.rekap-card {
+background: rgba(20, 20, 20, 0.9);
+border: 2px solid #00ffff;
+border-radius: 15px;
+overflow: hidden;
+display: flex;
+flex-direction: column;
+}
 
-        .total-situs {
-            background: rgba(0, 255, 255, 0.1);
-            color: white;
-            padding: 12px;
-            text-align: center;
-            font-weight: bold;
-            border-top: 1px solid #00ffff;
-            font-size: 1rem;
-        }
+.rekap-header {
+background: #00ffff;
+color: black;
+padding: 12px;
+font-weight: bold;
+text-align: center;
+text-transform: uppercase;
+}
 
-        .btn-hapus-situs {
-            background: #ff4d4d;
-            color: white;
-            border: none;
-            padding: 12px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            text-transform: uppercase;
-        }
+.rekap-body { padding: 15px; flex-grow: 1; }
 
-        @media (max-width: 1100px) {
-            .rekap-grid { grid-template-columns: repeat(2, 1fr); }
-        }
+.produk-row {
+display: flex;
+justify-content: space-between;
+padding: 10px 0;
+border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+font-weight: bold;
+color: #00ffff;
+}
 
-        @media (max-width: 750px) {
-            .rekap-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+.pembeli-box {
+margin-top: 15px;
+padding: 12px;
+background: rgba(255, 255, 255, 0.05);
+border-radius: 8px;
+font-size: 0.9rem;
+color: #ffea00;
+border-left: 4px solid #ffea00;
+}
+
+.total-situs {
+background: rgba(0, 255, 255, 0.1);
+color: white;
+padding: 12px;
+text-align: center;
+font-weight: bold;
+border-top: 1px solid #00ffff;
+}
+
+.btn-hapus-situs {
+background: #ff4d4d;
+color: white;
+border: none;
+padding: 12px;
+cursor: pointer;
+font-weight: bold;
+width: 100%;
+text-transform: uppercase;
+}
+
+@media (max-width: 1100px) { .rekap-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 750px) { .rekap-grid { grid-template-columns: 1fr; } }
+</style>
 </head>
 <body>
 
-    <h1>📊 REKAP PESANAN PANHA COFFEE</h1>
+<h1>📊 ADMIN PANHA COFFEE</h1>
 
-    <div class="status-box">
-        <div class="status-title">KONTROL STATUS TOKO</div>
-        <div id="statusInfo" class="status-info">Memuat status toko...</div>
-        <div class="jadwal-info">
-            Jadwal otomatis: <b>BUKA 00:30</b> — <b>TUTUP 00:00</b>
-        </div>
-        <div class="status-actions">
-            <button class="btn-status btn-buka" onclick="setStoreMode('manual_open')">Buka</button>
-            <button class="btn-status btn-tutup" onclick="setStoreMode('manual_closed')">Tutup</button>
-            <button class="btn-status btn-auto" onclick="setStoreMode('auto')">Auto</button>
-        </div>
+<!-- PANEL KONTROL STATUS TOKO -->
+<div class="status-toko-box">
+    <h2>🏪 KONTROL STATUS TOKO</h2>
+    <div class="status-display-badge" id="statusTampilanAdmin">Memuat status toko...</div>
+    <p style="font-size: 0.9rem; color: #ffea00; margin-bottom: 15px;">Jadwal otomatis: BUKA 18:00 — TUTUP 00:00</p>
+    <div class="status-buttons">
+        <button class="btn-status btn-buka-manual" onclick="aturStatusToko('BUKA_MANUAL')">BUKA</button>
+        <button class="btn-status btn-tutup-manual" onclick="aturStatusToko('TUTUP_MANUAL')">TUTUP</button>
+        <button class="btn-status btn-auto" onclick="aturStatusToko('AUTO')">AUTO</button>
     </div>
+</div>
 
-    <div id="masterAdmin"></div>
+<!-- PANEL KELOLA STOK -->
+<div class="stok-manager-box">
+    <h2>📦 KELOLA STOK PRODUK</h2>
+    <div class="stok-list" id="stokManagerList">
+        <p style="text-align:center;">Memuat data stok...</p>
+    </div>
+</div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyD8d5HgUxJhU3qy5qsb-j2TwFWam-ASjuI",
-            authDomain: "owen-caffe.firebaseapp.com",
-            databaseURL: "https://owen-caffe-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "owen-caffe",
-            storageBucket: "owen-caffe.firebasestorage.app",
-            appId: "1:374030985787:web:1f9ddf8ecf3d8d1cb58a1e"
-        };
+<h2>📋 REKAP PESANAN</h2>
+<div id="masterAdmin"></div>
 
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+<script>
+const firebaseConfig = {
+apiKey: "AIzaSyD8d5HgUxJhU3qy5qsb-j2TwFWam-ASjuI",
+authDomain: "owen-caffe.firebaseapp.com",
+databaseURL: "https://owen-caffe-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId: "owen-caffe",
+storageBucket: "owen-caffe.appspot.com",
+appId: "1:374030985787:web:1f9ddf8ecf3d8d1cb58a1e"
+};
 
-        function getTodayDate() {
-            const d = new Date();
-            return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
-        }
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
 
-        function formatTanggalIndo(tglString) {
-            const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-            const part = tglString.split('-');
-            if (part.length !== 3) return tglString;
-            return `${parseInt(part[0])} ${bulanIndo[parseInt(part[1]) - 1]} ${part[2]}`;
-        }
+// Fungsi Mengubah Status Toko ke Firebase
+function aturStatusToko(mode) {
+database.ref('pengaturan/status_toko').set(mode, (error) => {
+if (error) {
+alert("Gagal mengubah status toko!");
+} else {
+alert("Status toko berhasil diubah ke: " + mode);
+}
+});
+}
 
-        function getAutoOpenStatus() {
-            const sekarang = new Date();
-            const jam = sekarang.getHours();
-            const menit = sekarang.getMinutes();
-            const waktuSkg = (jam * 100) + menit;
+// Pantau Status Toko di Admin
+database.ref('pengaturan/status_toko').on('value', (snapshot) => {
+const mode = snapshot.val() || 'AUTO';
+const badge = document.getElementById('statusTampilanAdmin');
+const sekarang = new Date();
+const jam = sekarang.getHours();
+const menit = sekarang.getMinutes();
+const waktuSkg = (jam * 100) + menit;
+const isAutoOpen = (waktuSkg >= 1800 || waktuSkg < 0);
 
-            return (waktuSkg >= 30);
-        }
+let statusReal = isAutoOpen;
+let teksStatus = "";
 
-        function resolveStoreStatus(storeConfig) {
-            if (!storeConfig || !storeConfig.mode || storeConfig.mode === 'auto') {
-                return {
-                    mode: 'auto',
-                    isOpen: getAutoOpenStatus(),
-                    label: getAutoOpenStatus() ? '🟢 TOKO BUKA (AUTO)' : '🔴 TOKO TUTUP (AUTO)'
-                };
-            }
+if (mode === 'BUKA_MANUAL') {
+statusReal = true;
+teksStatus = "🟢 TOKO BUKA (MANUAL)";
+} else if (mode === 'TUTUP_MANUAL') {
+statusReal = false;
+teksStatus = "🔴 TOKO TUTUP (MANUAL)";
+} else {
+teksStatus = isAutoOpen ? "🟢 TOKO BUKA (OTOMATIS)" : "🔴 TOKO TUTUP (OTOMATIS)";
+}
 
-            if (storeConfig.mode === 'manual_open') {
-                return {
-                    mode: 'manual_open',
-                    isOpen: true,
-                    label: '🟢 TOKO BUKA (MANUAL)'
-                };
-            }
+badge.innerText = teksStatus;
+badge.style.color = statusReal ? "#00ffff" : "#ff4d4d";
+});
 
-            return {
-                mode: 'manual_closed',
-                isOpen: false,
-                label: '🔴 TOKO TUTUP (MANUAL)'
-            };
-        }
+// 1. RENDER KONTROL STOK DI ADMIN
+database.ref('stok_produk/').on('value', (snapshot) => {
+const data = snapshot.val();
+const stokContainer = document.getElementById('stokManagerList');
+stokContainer.innerHTML = "";
 
-        function setStoreMode(mode) {
-            database.ref('store_status').set({
-                mode: mode,
-                updatedAt: Date.now()
-            });
-        }
+if (data) {
+Object.keys(data).forEach((id) => {
+const item = data[id];
+const stokSaatIni = item.stok !== undefined ? item.stok : 0;
+stokContainer.innerHTML += `
+<div class="stok-item">
+    <img src="${item.img}" alt="${item.nama}">
+    <div style="font-weight:bold; font-size:0.9rem; margin-bottom:5px;">${item.nama}</div>
+    <div style="color:#00ffff; font-size:0.85rem;">Stok: <span id="label_stok_${id}">${stokSaatIni}</span></div>
+    <div class="stok-controls">
+        <input type="number" id="input_stok_${id}" class="stok-input" value="${stokSaatIni}" min="0">
+        <button class="btn-update-stok" onclick="updateStok('${id}')">Simpan</button>
+    </div>
+</div>`;
+});
+} else {
+stokContainer.innerHTML = "<p>Belum ada produk di database.</p>";
+}
+});
 
-        database.ref('store_status').on('value', (snapshot) => {
-            const config = snapshot.val() || { mode: 'auto' };
-            const status = resolveStoreStatus(config);
-            const statusInfo = document.getElementById('statusInfo');
+function updateStok(id) {
+const inputVal = document.getElementById('input_stok_' + id).value;
+const stokBaru = parseInt(inputVal);
 
-            statusInfo.innerText = status.label;
-            statusInfo.style.color = status.isOpen ? '#00ffff' : '#ff4d4d';
-            statusInfo.style.border = status.isOpen ? '1px solid #00ffff' : '1px solid #ff4d4d';
-        });
+if (isNaN(stokBaru) || stokBaru < 0) {
+alert("Jumlah stok tidak valid!");
+return;
+}
 
-        setInterval(() => {
-            database.ref('store_status').once('value').then((snapshot) => {
-                const config = snapshot.val() || { mode: 'auto' };
-                if (config.mode === 'auto') {
-                    const status = resolveStoreStatus(config);
-                    const statusInfo = document.getElementById('statusInfo');
-                    statusInfo.innerText = status.label;
-                    statusInfo.style.color = status.isOpen ? '#00ffff' : '#ff4d4d';
-                    statusInfo.style.border = status.isOpen ? '1px solid #00ffff' : '1px solid #ff4d4d';
-                }
-            });
-        }, 30000);
+database.ref('stok_produk/' + id).update({
+stok: stokBaru
+}, (error) => {
+if (error) {
+alert("Gagal mengupdate stok!");
+} else {
+alert("Stok berhasil diperbarui!");
+}
+});
+}
 
-        database.ref('pesanan/').on('value', (snapshot) => {
-            const data = snapshot.val();
-            const master = document.getElementById('masterAdmin');
-            master.innerHTML = "";
+// 2. RENDER REKAP PESANAN
+function formatTanggalIndo(tglString) {
+const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+const part = tglString.split('-');
+if (part.length !== 3) return tglString;
+return `${parseInt(part[0])} ${bulanIndo[parseInt(part[1]) - 1]} ${part[2]}`;
+}
 
-            if (!data) return;
+function getTodayDate() {
+const d = new Date();
+return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+}
 
-            const groups = {};
-            Object.keys(data).forEach(id => {
-                const p = data[id];
-                let tglKey = p.tanggal || getTodayDate();
-                const situs = p.SITUS || "LAIN-LAIN";
-                
-                if (!groups[tglKey]) groups[tglKey] = {};
-                if (!groups[tglKey][situs]) {
-                    groups[tglKey][situs] = { items: {}, pembeli: [], totalQty: 0 };
-                }
+database.ref('pesanan/').on('value', (snapshot) => {
+const data = snapshot.val();
+const master = document.getElementById('masterAdmin');
+master.innerHTML = "";
 
-                const qty = parseInt(p.jumlah) || 0;
-                groups[tglKey][situs].items[p.produk] = (groups[tglKey][situs].items[p.produk] || 0) + qty;
-                groups[tglKey][situs].totalQty += qty;
-                
-                if (!groups[tglKey][situs].pembeli.includes(p.nama)) {
-                    groups[tglKey][situs].pembeli.push(p.nama);
-                }
-            });
+if (!data) {
+master.innerHTML = "<p style='text-align:center;'>Belum ada data pesanan.</p>";
+return;
+}
 
-            const sortedDates = Object.keys(groups).sort((a,b) => {
-                const da = a.split('-').reverse().join('');
-                const db = b.split('-').reverse().join('');
-                return db.localeCompare(da);
-            });
+const groups = {};
+Object.keys(data).forEach(id => {
+const p = data[id];
+let tglKey = p.tanggal || getTodayDate();
+const situs = p.SITUS || "LAIN-LAIN";
 
-            sortedDates.forEach(tgl => {
-                const section = document.createElement('div');
-                section.className = 'tanggal-group';
-                section.innerHTML = `
-                    <button class="btn-hapus-tgl" onclick="hapusTanggal('${tgl}')">Hapus Hari Ini</button>
-                    <div class="tanggal-label">🗓️ ${formatTanggalIndo(tgl)}</div>
-                `;
-                
-                const grid = document.createElement('div');
-                grid.className = 'rekap-grid';
+if (!groups[tglKey]) groups[tglKey] = {};
+if (!groups[tglKey][situs]) {
+groups[tglKey][situs] = { items: {}, pembeli: [], totalQty: 0 };
+}
 
-                Object.keys(groups[tgl]).sort().forEach(situs => {
-                    const info = groups[tgl][situs];
-                    let produkHtml = "";
+const qty = parseInt(p.jumlah) || 0;
+groups[tglKey][situs].items[p.produk] = (groups[tglKey][situs].items[p.produk] || 0) + qty;
+groups[tglKey][situs].totalQty += qty;
 
-                    for (const [nama, qty] of Object.entries(info.items)) {
-                        produkHtml += `<div class="produk-row"><span>🥤 ${nama}</span><span>${qty} Botol</span></div>`;
-                    }
+if (!groups[tglKey][situs].pembeli.includes(p.nama)) {
+groups[tglKey][situs].pembeli.push(p.nama);
+}
+});
 
-                    grid.innerHTML += `
-                        <div class="rekap-card">
-                            <div class="rekap-header">📍 ${situs}</div>
-                            <div class="rekap-body">
-                                ${produkHtml}
-                                <div class="pembeli-box"><b>Nama Pemesan:</b><br>${info.pembeli.join(', ')}</div>
-                            </div>
-                            <div class="total-situs">Total: ${info.totalQty} PCS</div>
-                            <button class="btn-hapus-situs" onclick="hapusSitus('${tgl}', '${situs}')">Hapus Situs</button>
-                        </div>`;
-                });
+const sortedDates = Object.keys(groups).sort((a,b) => {
+const da = a.split('-').reverse().join('');
+const db = b.split('-').reverse().join('');
+return db.localeCompare(da);
+});
 
-                section.appendChild(grid);
-                master.appendChild(section);
-            });
-        });
+sortedDates.forEach(tgl => {
+const section = document.createElement('div');
+section.className = 'tanggal-group';
+section.innerHTML = `
+<button class="btn-hapus-tgl" onclick="hapusTanggal('${tgl}')">Hapus Hari Ini</button>
+<div class="tanggal-label">🗓️ ${formatTanggalIndo(tgl)}</div>
+`;
 
-        function hapusSitus(tgl, situs) {
-            if (confirm(`Hapus data ${situs} untuk tanggal ${tgl}?`)) {
-                database.ref('pesanan/').once('value', (snap) => {
-                    snap.forEach((child) => {
-                        const p = child.val();
-                        const tglData = p.tanggal || getTodayDate();
-                        if (tglData === tgl && (p.SITUS === situs || (!p.SITUS && situs === "LAIN-LAIN"))) {
-                            child.ref.remove();
-                        }
-                    });
-                });
-            }
-        }
+const grid = document.createElement('div');
+grid.className = 'rekap-grid';
 
-        function hapusTanggal(tgl) {
-            if (confirm(`Hapus SEMUA data untuk tanggal ${tgl}?`)) {
-                database.ref('pesanan/').once('value', (snap) => {
-                    snap.forEach((child) => {
-                        const p = child.val();
-                        const tglData = p.tanggal || getTodayDate();
-                        if (tglData === tgl) {
-                            child.ref.remove();
-                        }
-                    });
-                });
-            }
-        }
-    </script>
+Object.keys(groups[tgl]).sort().forEach(situs => {
+const info = groups[tgl][situs];
+let produkHtml = "";
+for (const [nama, qty] of Object.entries(info.items)) {
+produkHtml += `<div class="produk-row"><span>🥤 ${nama}</span><span>${qty} Botol</span></div>`;
+}
+
+grid.innerHTML += `
+<div class="rekap-card">
+<div class="rekap-header">📍 ${situs}</div>
+<div class="rekap-body">
+${produkHtml}
+<div class="pembeli-box"><b>Nama Pemesan:</b><br>${info.pembeli.join(', ')}</div>
+</div>
+<div class="total-situs">Total: ${info.totalQty} PCS</div>
+<button class="btn-hapus-situs" onclick="hapusSitus('${tgl}', '${situs}')">Hapus Situs</button>
+</div>`;
+});
+
+section.appendChild(grid);
+master.appendChild(section);
+});
+});
+
+function hapusSitus(tgl, situs) {
+if (confirm(`Hapus data ${situs} untuk tanggal ${tgl}?`)) {
+database.ref('pesanan/').once('value', (snap) => {
+snap.forEach((child) => {
+const p = child.val();
+const tglData = p.tanggal || getTodayDate();
+if (tglData === tgl && (p.SITUS === situs || (!p.SITUS && situs === "LAIN-LAIN"))) {
+child.ref.remove();
+}
+});
+});
+}
+}
+
+function hapusTanggal(tgl) {
+if (confirm(`Hapus SEMUA data untuk tanggal ${tgl}?`)) {
+database.ref('pesanan/').once('value', (snap) => {
+snap.forEach((child) => {
+const p = child.val();
+const tglData = p.tanggal || getTodayDate();
+if (tglData === tgl) {
+child.ref.remove();
+}
+});
+});
+}
+}
+</script>
 </body>
 </html>
